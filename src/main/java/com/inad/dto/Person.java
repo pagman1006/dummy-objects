@@ -16,4 +16,5 @@ public class Person {
     private boolean isSingle;
     private long height;
     private Date bithday;
+    private Phone phone;
 }

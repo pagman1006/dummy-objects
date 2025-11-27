@@ -26,7 +26,7 @@ public class Factory {
             final Field[] fields = className.getDeclaredFields();
 
             for (Field field : fields) {
-                field.setAccessible(true);
+                field.trySetAccessible();
 
                 if (field.getType().isEnum()) {
                     field.set(instance, randomEnum(field));
@@ -55,7 +55,7 @@ public class Factory {
     }
 
     private static <T> void setObject(final T instance, final Field field) throws IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException {
-        field.setAccessible(true);
+        field.trySetAccessible();
         switch (field.getType().getSimpleName()) {
             case "String" -> field.set(instance, randomString(10, LETTERS));
             case "Integer" -> field.set(instance, randomNumber(1, 10));
