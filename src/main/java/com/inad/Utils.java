@@ -36,7 +36,8 @@ public class Utils {
         return random.nextBoolean();
     }
 
-    public static <E extends Enum<E>> E randomEnum(final Field field) throws ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    public static <E extends Enum<E>> E randomEnum(final Field field) throws ClassNotFoundException, ClassCastException {
         E[] enums = (E[]) Class.forName(field.getType().getName()).getEnumConstants();
         int rand = randomNumber(0, enums.length);
         return enums[rand];
