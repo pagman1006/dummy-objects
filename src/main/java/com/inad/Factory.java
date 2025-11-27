@@ -12,7 +12,7 @@ public class Factory {
 
     private static final String LETTERS = "ABCDEFHIJKLMNOPQRSTUVWXYZ -";
 
-    public static <T> List<T> create(final Class<T> className, final Integer size) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static <T> List<T> create(final Class<T> className, final Integer size) {
         final List<T> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             list.add(create(className));
@@ -20,22 +20,27 @@ public class Factory {
         return list;
     }
 
-    private static <T> T create(final Class<T> className) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-        final T instance = className.getDeclaredConstructor().newInstance();
-        final Field[] fields = className.getDeclaredFields();
+    private static <T> T create(final Class<T> className) {
+        try {
+            final T instance = className.getDeclaredConstructor().newInstance();
+            final Field[] fields = className.getDeclaredFields();
 
-        for (Field field : fields) {
-            field.setAccessible(true);
+            for (Field field : fields) {
+                field.setAccessible(true);
 
-            if (field.getType().isEnum()) {
-                field.set(instance, randomEnum(field));
-            } else if (field.getType().isPrimitive()) {
-                setPrimitive(instance, field);
-            } else {
-                setObject(instance, field);
+                if (field.getType().isEnum()) {
+                    field.set(instance, randomEnum(field));
+                } else if (field.getType().isPrimitive()) {
+                    setPrimitive(instance, field);
+                } else {
+                    setObject(instance, field);
+                }
             }
+            return instance;
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
-        return instance;
     }
 
     private static <T> void setPrimitive(final T instance, final Field field) throws IllegalAccessException {
