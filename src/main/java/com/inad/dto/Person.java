@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ToString
@@ -15,6 +16,6 @@ public class Person {
     private Boolean isMale;
     private boolean isSingle;
     private long height;
-    private Date bithday;
-    private Phone phone;
+    private Date birthDate;
+    private List<Phone> phones;
 }
