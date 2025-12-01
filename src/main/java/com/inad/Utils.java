@@ -16,10 +16,6 @@ public class Utils {
         return sb.toString();
     }
 
-    public static int randomNumber(final int min, final int max) {
-        return random.nextInt(min, max);
-    }
-
     public static long randomNumber(final long min, final long max) {
         return random.nextLong(min, max);
     }
@@ -37,10 +33,15 @@ public class Utils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <E extends Enum<E>> E randomEnum(final Field field) throws ClassNotFoundException, ClassCastException {
+    public static <E extends Enum<E>> E randomEnum(final Field field)
+            throws ClassNotFoundException, ClassCastException {
         E[] enums = (E[]) Class.forName(field.getType().getName()).getEnumConstants();
         int rand = randomNumber(0, enums.length);
         return enums[rand];
+    }
+
+    public static int randomNumber(final int min, final int max) {
+        return random.nextInt(min, max);
     }
 
 }
