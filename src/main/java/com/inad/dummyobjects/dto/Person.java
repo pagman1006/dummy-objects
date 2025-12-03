@@ -1,4 +1,4 @@
-package com.inad.dto;
+package com.inad.dummyobjects.dto;
 
 import lombok.Data;
 import lombok.ToString;
