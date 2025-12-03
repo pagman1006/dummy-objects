@@ -6,9 +6,10 @@
 
   <groupId>com.inad.dummyobjects</groupId>
   <artifactId>dummy-objects</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>dummy-objects</name>
   <description>Dummy data generator for objects</description>
+  <packaging>jar</packaging>
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
