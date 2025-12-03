@@ -1,4 +1,4 @@
-package com.inad;
+package com.inad.dummyobjects;
 
 import java.lang.reflect.Field;
 import java.util.Random;

@@ -1,4 +1,4 @@
-package com.inad;
+package com.inad.dummyobjects;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,10 +11,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import static com.inad.Utils.randomBoolean;
-import static com.inad.Utils.randomEnum;
-import static com.inad.Utils.randomNumber;
-import static com.inad.Utils.randomString;
+import static com.inad.dummyobjects.Utils.randomBoolean;
+import static com.inad.dummyobjects.Utils.randomEnum;
+import static com.inad.dummyobjects.Utils.randomNumber;
+import static com.inad.dummyobjects.Utils.randomString;
 
 public class Factory {
 
