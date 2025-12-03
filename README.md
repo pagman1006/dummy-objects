@@ -42,7 +42,7 @@ This class centralizes object creation.
 
 ## Configuration
 
-The factory needs information about the classes to be created and the dummy data to be used for each. This is done through a `PropertyProvider`.
+The factory not needs information about the classes to be created and the dummy data to be used for each.
 
 ## Example Usage
 
