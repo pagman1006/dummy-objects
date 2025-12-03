@@ -21,7 +21,7 @@ scenarios where you need a large number of objects with predefined data.
 
     ```xml
     <dependency>
-        <groupId>com.example.dummyobjects</groupId>
+        <groupId>com.inad.dummyobjects</groupId>
         <artifactId>dummy-objects</artifactId>
         <version>1.0.0</version>
     </dependency>
