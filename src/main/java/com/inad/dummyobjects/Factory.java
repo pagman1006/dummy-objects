@@ -3,6 +3,7 @@ package com.inad.dummyobjects;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,33 +12,32 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import static com.inad.dummyobjects.Constants.*;
+import static com.inad.dummyobjects.ConstantsLog.CLASS_NAME_LOG;
+import static com.inad.dummyobjects.ConstantsLog.IS_COLLECTION_LOG;
 import static com.inad.dummyobjects.Utils.randomBoolean;
 import static com.inad.dummyobjects.Utils.randomEnum;
 import static com.inad.dummyobjects.Utils.randomNumber;
 import static com.inad.dummyobjects.Utils.randomString;
 
+/**
+ * Factory class responsible for creating dummy objects filled with random data.
+ * <p>
+ * This class uses reflection to iterate over fields of a given class and populate them
+ * with random values based on their type. It supports primitives, standard Java types
+ * (String, Date, Numbers, etc.), Enums, and Collections (Lists).
+ * </p>
+ */
 public class Factory {
 
-    private static final String LETTERS = "ABCDEFHIJKLMNOPQRSTUVWXYZ -";
-    private static final String INT = "int";
-    private static final String LONG = "long";
-    private static final String FLOAT = "float";
-    private static final String DOUBLE = "double";
-    private static final String BOOLEAN = "boolean";
-    private static final String STRING = "string";
-    private static final String INTEGER = "integer";
-    private static final String DATE = "date";
-    private static final String INSTANT = "instant";
-    private static final String TIMESTAMP = "timestamp";
-    private static final String LOCAL_DATE = "localdate";
-    private static final String LOCAL_DATE_TIME = "localdatetime";
-    private static final String LOCAL_TIME = "localtime";
-
-    private static final int SIZE_LIST = 3;
-
-    private static final String IS_COLLECTION_LOG = "isCollection";
-    private static final String CLASS_NAME_LOG = "ClassName: ";
-
+    /**
+     * Creates a list of dummy objects of the specified class type, populated with random data.
+     *
+     * @param className The class of the objects to be created.
+     * @param size      The number of objects to create in the list.
+     * @param <T>       The type of the objects.
+     * @return A list containing {@code size} instances of {@code className} populated with random data.
+     */
     public static <T> List<T> create(final Class<T> className, final int size) {
         final List<T> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -46,6 +46,14 @@ public class Factory {
         return list;
     }
 
+    /**
+     * Creates a single instance of the specified class populated with random data.
+     *
+     * @param className The class of the object to create.
+     * @param <T>       The type of the object.
+     * @return An instance of {@code className} with populated fields.
+     * @throws RuntimeException if instantiation, field access, or other reflection operations fail.
+     */
     private static <T> T create(final Class<T> className) {
         try {
             final T instance = className.getDeclaredConstructor().newInstance();
@@ -71,6 +79,15 @@ public class Factory {
         }
     }
 
+    /**
+     * Populates a field that is assignable from {@link Collection} (specifically List) with random objects.
+     *
+     * @param instance The object instance containing the field.
+     * @param field    The field to populate.
+     * @param <T>      The type of the instance.
+     * @throws ClassNotFoundException if the generic type of the list cannot be found.
+     * @throws IllegalAccessException if the field cannot be accessed.
+     */
     private static <T> void setList(final T instance, final Field field)
             throws ClassNotFoundException, IllegalAccessException {
         System.out.println(IS_COLLECTION_LOG);
@@ -80,6 +97,14 @@ public class Factory {
         field.set(instance, obj);
     }
 
+    /**
+     * Populates a primitive field with a random value appropriate for its type.
+     *
+     * @param instance The object instance containing the field.
+     * @param field    The field to populate.
+     * @param <T>      The type of the instance.
+     * @throws IllegalAccessException if the field cannot be accessed.
+     */
     private static <T> void setPrimitive(final T instance, final Field field) throws IllegalAccessException {
         switch (field.getType().getSimpleName()) {
             case INT -> field.set(instance, randomNumber(1, 10));
@@ -92,6 +117,22 @@ public class Factory {
         }
     }
 
+    /**
+     * Populates a non-primitive object field with a random value or a nested dummy object.
+     * <p>
+     * Handles specific standard types (String, Numbers, Dates, Boolean) by generating random values.
+     * For unknown types, it recursively creates a new dummy object.
+     * </p>
+     *
+     * @param instance The object instance containing the field.
+     * @param field    The field to populate.
+     * @param <T>      The type of the instance.
+     * @throws IllegalAccessException    if the field cannot be accessed.
+     * @throws ClassNotFoundException    if the class of the field type cannot be found.
+     * @throws InvocationTargetException if the constructor throws an exception.
+     * @throws NoSuchMethodException     if a matching constructor is not found.
+     * @throws InstantiationException    if the class cannot be instantiated.
+     */
     private static <T> void setObject(final T instance, final Field field)
             throws IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException,
             InstantiationException {
@@ -103,6 +144,7 @@ public class Factory {
             case LONG -> field.set(instance, randomNumber(100L, 1000L));
             case FLOAT -> field.set(instance, randomNumber(10f, 100f));
             case DOUBLE -> field.set(instance, randomNumber(1.0, 10.0));
+            case BIG_DECIMAL -> field.set(instance, new BigDecimal(randomNumber(10, 100)));
             case BOOLEAN -> field.set(instance, randomBoolean());
             case DATE -> field.set(instance, new Date());
             case INSTANT -> field.set(instance, new Date().toInstant());
@@ -119,9 +161,15 @@ public class Factory {
         }
     }
 
+    /**
+     * Extracts the generic class name from a parameterized type (e.g., getting "String" from "List<String>").
+     *
+     * @param genericType The type to inspect.
+     * @return The name of the generic class.
+     */
     private static String getGenericClassName(final Type genericType) {
         String className = genericType.getTypeName();
-        className = className.substring(className.indexOf("<") + 1, className.lastIndexOf(">"));
+        className = className.substring(className.indexOf(MINUS_THAN) + 1, className.lastIndexOf(MAJOR_THAN));
         System.out.println(CLASS_NAME_LOG.concat(className));
         return className;
     }
