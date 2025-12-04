@@ -12,7 +12,7 @@ package com.inad.dummyobjects;
 public class Constants {
 
     /**
-     * A string containing uppercase letters, a space, and a hyphen.
+     * A string containing characters.
      * Used as the source characters for generating random strings.
      */
     public static final String LETTERS = "ABCDEFHIJKLMNOPQRSTUVWXYZ -";

@@ -54,7 +54,7 @@ public class Factory {
      * @return An instance of {@code className} with populated fields.
      * @throws RuntimeException if instantiation, field access, or other reflection operations fail.
      */
-    private static <T> T create(final Class<T> className) {
+    public static <T> T create(final Class<T> className) {
         try {
             final T instance = className.getDeclaredConstructor().newInstance();
             final Field[] fields = className.getDeclaredFields();
@@ -80,7 +80,7 @@ public class Factory {
     }
 
     /**
-     * Populates a field that is assignable from {@link Collection} (specifically List) with random objects.
+     * Populates a field that is assignable from {@link Collection} (specific List) with random objects.
      *
      * @param instance The object instance containing the field.
      * @param field    The field to populate.
