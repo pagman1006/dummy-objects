@@ -1,0 +1,51 @@
+package com.inad.dummyobjects;
+
+/**
+ * Constants used for type mapping and random generation settings.
+ * <p>
+ * This class holds string literals representing simple class names (in lowercase)
+ * which are used to identify field types via reflection. It also contains
+ * configuration for random data generation, such as the character set for strings
+ * and the default size for collections.
+ * </p>
+ */
+public class Constants {
+
+    /**
+     * A string containing characters.
+     * Used as the source characters for generating random strings.
+     */
+    public static final String LETTERS = "ABCDEFHIJKLMNOPQRSTUVWXYZ -";
+
+    // Type identifiers used for reflection
+    public static final String INT = "int";
+    public static final String LONG = "long";
+    public static final String FLOAT = "float";
+    public static final String DOUBLE = "double";
+    public static final String BOOLEAN = "boolean";
+    public static final String STRING = "string";
+    public static final String INTEGER = "integer";
+    public static final String BIG_DECIMAL = "bigdecimal";
+    public static final String DATE = "date";
+    public static final String INSTANT = "instant";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String LOCAL_DATE = "localdate";
+    public static final String LOCAL_DATE_TIME = "localdatetime";
+    public static final String LOCAL_TIME = "localtime";
+
+    /**
+     * The default number of elements to generate when populating a List.
+     */
+    public static final int SIZE_LIST = 3;
+
+    /**
+     * The opening angle bracket used for parsing generic type names.
+     */
+    public static final String MINUS_THAN = "<";
+
+    /**
+     * The closing angle bracket used for parsing generic type names.
+     */
+    public static final String MAJOR_THAN = ">";
+    
+}
