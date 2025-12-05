@@ -1,4 +1,6 @@
-package com.inad.dummyobjects;
+package com.inad.dummyobjects.util;
+
+import com.inad.dummyobjects.Factory;
 
 import java.lang.reflect.Field;
 import java.util.Random;
@@ -86,6 +88,9 @@ public class Utils {
     public static <E extends Enum<E>> E randomEnum(final Field field)
             throws ClassNotFoundException, ClassCastException {
         E[] enums = (E[]) Class.forName(field.getType().getName()).getEnumConstants();
+        if (enums == null) {
+            throw new ClassCastException("Field type is not an enum.");
+        }
         int rand = randomNumber(0, enums.length);
         return enums[rand];
     }

@@ -12,13 +12,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import static com.inad.dummyobjects.Constants.*;
-import static com.inad.dummyobjects.ConstantsLog.CLASS_NAME_LOG;
-import static com.inad.dummyobjects.ConstantsLog.IS_COLLECTION_LOG;
-import static com.inad.dummyobjects.Utils.randomBoolean;
-import static com.inad.dummyobjects.Utils.randomEnum;
-import static com.inad.dummyobjects.Utils.randomNumber;
-import static com.inad.dummyobjects.Utils.randomString;
+import static com.inad.dummyobjects.constants.Constants.*;
+import static com.inad.dummyobjects.constants.ConstantsLog.CLASS_NAME_LOG;
+import static com.inad.dummyobjects.constants.ConstantsLog.IS_COLLECTION_LOG;
+import static com.inad.dummyobjects.util.Utils.randomBoolean;
+import static com.inad.dummyobjects.util.Utils.randomEnum;
+import static com.inad.dummyobjects.util.Utils.randomNumber;
+import static com.inad.dummyobjects.util.Utils.randomString;
 
 /**
  * Factory class responsible for creating dummy objects filled with random data.
