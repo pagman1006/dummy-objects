@@ -1,4 +1,4 @@
-package com.inad.dummyobjects;
+package com.inad.dummyobjects.constants;
 
 /**
  * Constants used for logging within the library.

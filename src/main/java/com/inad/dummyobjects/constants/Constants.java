@@ -1,4 +1,4 @@
-package com.inad.dummyobjects;
+package com.inad.dummyobjects.constants;
 
 /**
  * Constants used for type mapping and random generation settings.
