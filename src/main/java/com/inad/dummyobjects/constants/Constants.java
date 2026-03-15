@@ -15,7 +15,7 @@ public class Constants {
      * A string containing characters.
      * Used as the source characters for generating random strings.
      */
-    public static final String LETTERS = "ABCDEFHIJKLMNOPQRSTUVWXYZ -";
+    public static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ -";
 
     // Type identifiers used for reflection
     public static final String INT = "int";
