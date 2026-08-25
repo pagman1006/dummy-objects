@@ -15,10 +15,7 @@ import java.util.List;
 import static com.inad.dummyobjects.constants.Constants.*;
 import static com.inad.dummyobjects.constants.ConstantsLog.CLASS_NAME_LOG;
 import static com.inad.dummyobjects.constants.ConstantsLog.IS_COLLECTION_LOG;
-import static com.inad.dummyobjects.util.Utils.randomBoolean;
-import static com.inad.dummyobjects.util.Utils.randomEnum;
-import static com.inad.dummyobjects.util.Utils.randomNumber;
-import static com.inad.dummyobjects.util.Utils.randomString;
+import static com.inad.dummyobjects.util.Utils.*;
 
 /**
  * Factory class responsible for creating dummy objects filled with random data.

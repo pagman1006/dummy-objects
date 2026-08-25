@@ -14,7 +14,7 @@ class UtilsTest {
 
     @Test
     @DisplayName("randomString should return string of correct length and characters")
-    void testRandomString() {
+    void randomStringTest() {
         String charset = "abc";
         int length = 10;
         String result = Utils.randomString(length, charset);
@@ -27,7 +27,7 @@ class UtilsTest {
 
     @Test
     @DisplayName("randomString with length 0 returns empty string")
-    void testRandomStringEmpty() {
+    void randomStringEmptyTest() {
         String result = Utils.randomString(0, "abc");
         assertEquals("", result);
     }
@@ -36,7 +36,7 @@ class UtilsTest {
 
     @RepeatedTest(5)
     @DisplayName("randomNumber(long) returns value within range")
-    void testRandomNumberLong() {
+    void randomNumberLongTest() {
         long min = 100L;
         long max = 200L;
         long result = Utils.randomNumber(min, max);
@@ -49,7 +49,7 @@ class UtilsTest {
 
     @RepeatedTest(5)
     @DisplayName("randomNumber(float) returns value within range")
-    void testRandomNumberFloat() {
+    void randomNumberFloatTest() {
         float min = 1.5f;
         float max = 5.5f;
         float result = Utils.randomNumber(min, max);
@@ -62,7 +62,7 @@ class UtilsTest {
 
     @RepeatedTest(5)
     @DisplayName("randomNumber(double) returns value within range")
-    void testRandomNumberDouble() {
+    void randomNumberDoubleTest() {
         double min = 10.0;
         double max = 20.0;
         double result = Utils.randomNumber(min, max);
@@ -75,7 +75,7 @@ class UtilsTest {
 
     @RepeatedTest(5)
     @DisplayName("randomNumber(int) returns value within range")
-    void testRandomNumberInt() {
+    void randomNumberIntTest() {
         int min = 5;
         int max = 10;
         int result = Utils.randomNumber(min, max);
@@ -88,7 +88,7 @@ class UtilsTest {
 
     @Test
     @DisplayName("randomBoolean does not throw exception")
-    void testRandomBoolean() {
+    void randomBooleanTest() {
         // Since it's random, we just ensure it returns a valid boolean value without crashing
         assertDoesNotThrow(Utils::randomBoolean);
 
@@ -108,7 +108,7 @@ class UtilsTest {
 
     @Test
     @DisplayName("randomEnum returns a valid enum constant from the field type")
-    void testRandomEnum() throws Exception {
+    void randomEnumTest() throws Exception {
         Field field = this.getClass().getDeclaredField("dummyField");
 
         // Repeat a few times to ensure we can hit different values potentially
@@ -121,7 +121,7 @@ class UtilsTest {
 
     @Test
     @DisplayName("randomEnum throws ClassCastException for non-enum fields")
-    void testRandomEnumWithNonEnumField() throws Exception {
+    void randomEnumWithNonEnumFieldTest() throws Exception {
         Field field = this.getClass().getDeclaredField("stringField");
 
         assertThrows(ClassCastException.class, () -> Utils.randomEnum(field));

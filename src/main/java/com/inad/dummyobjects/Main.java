@@ -7,9 +7,9 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        List<Person> persons = Factory.create(Person.class, 3);
+        final List<Person> persons = Factory.create(Person.class, 3);
         System.out.println("Instances Created: " + persons.size());
-        for (Person person : persons) {
+        for (final Person person : persons) {
             System.out.println(person);
         }
 
