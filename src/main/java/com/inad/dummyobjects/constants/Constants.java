@@ -12,12 +12,19 @@ package com.inad.dummyobjects.constants;
 public class Constants {
 
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private Constants() {}
+
+    /**
      * A string containing characters.
      * Used as the source characters for generating random strings.
      */
     public static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ -";
 
-    // Type identifiers used for reflection
+    /**
+     * Type identifiers used for reflection
+     */
     public static final String INT = "int";
     public static final String LONG = "long";
     public static final String FLOAT = "float";

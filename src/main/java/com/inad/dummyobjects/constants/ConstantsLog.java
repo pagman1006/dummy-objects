@@ -11,6 +11,11 @@ package com.inad.dummyobjects.constants;
 public class ConstantsLog {
 
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private ConstantsLog() {}
+
+    /**
      * Log message used when the factory detects that a field is a Collection.
      */
     public static final String IS_COLLECTION_LOG = "isCollection";

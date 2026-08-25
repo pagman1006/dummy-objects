@@ -15,6 +15,14 @@ import java.util.Random;
  */
 public class Utils {
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Utils() {}
+
+    /**
+     * The random number generator used for generating random values.
+     */
     private static final Random random = new Random();
 
     /**
