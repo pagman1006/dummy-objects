@@ -1,30 +1,30 @@
 package com.inad.dummyobjects;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.inad.dummyobjects.constants.Constants.*;
-import static com.inad.dummyobjects.constants.ConstantsLog.CLASS_NAME_LOG;
-import static com.inad.dummyobjects.constants.ConstantsLog.IS_COLLECTION_LOG;
 import static com.inad.dummyobjects.util.Utils.*;
 
 /**
- * Factory class responsible for creating dummy objects filled with random data.
+ * Generates populated instances of arbitrary Java classes for testing and prototyping.
  * <p>
- * This class uses reflection to iterate over fields of a given class and populate them
- * with random values based on their type. It supports primitives, standard Java types
- * (String, Date, Numbers, etc.), Enums, and Collections (Lists).
+ * The factory uses reflection to inspect a target type and assign synthetic values to its
+ * fields or record components based on the declared Java type. It supports primitive types,
+ * common value types such as {@link String}, {@link java.util.Date}, numeric wrappers, enums,
+ * collections, and nested object graphs that can be instantiated without explicit constructor
+ * arguments.
+ * </p>
+ * <p>
+ * This utility is primarily intended for creating sample data in unit tests and mock scenarios,
+ * where a fully populated object is needed without requiring a dedicated builder or fixture class.
  * </p>
  */
+@SuppressWarnings("unchecked")
 public class Factory {
 
     /**
@@ -53,109 +53,189 @@ public class Factory {
      */
     public static <T> T create(final Class<T> className) {
         try {
-            final T instance = className.getDeclaredConstructor().newInstance();
-            final Field[] fields = className.getDeclaredFields();
-
-            for (Field field : fields) {
-                field.trySetAccessible();
-
-                if (field.getType().isEnum()) {
-                    field.set(instance, randomEnum(field));
-                } else if (Collection.class.isAssignableFrom(field.getType())) {
-                    setList(instance, field);
-                } else if (field.getType().isPrimitive()) {
-                    setPrimitive(instance, field);
-                } else {
-                    setObject(instance, field);
-                }
-            }
-            return instance;
-        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException e) {
+            return className.isRecord() ? createRecord(className) : createObject(className, false);
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Populates a field that is assignable from {@link Collection} (specific List) with random objects.
+     * Creates a record instance by invoking its canonical constructor with values generated for each component.
      *
-     * @param instance The object instance containing the field.
-     * @param field    The field to populate.
-     * @param <T>      The type of the instance.
-     * @throws ClassNotFoundException if the generic type of the list cannot be found.
-     * @throws IllegalAccessException if the field cannot be accessed.
+     * @param clazz The record type to instantiate.
+     * @param <T> The record type.
+     * @return A new record instance containing generated values for each component.
+     * @throws NoSuchMethodException If the record does not expose a constructor matching its components.
+     * @throws InvocationTargetException If the constructor throws an exception.
+     * @throws InstantiationException If the record cannot be instantiated.
+     * @throws IllegalAccessException If constructor access is denied.
+     * @throws ClassNotFoundException If a nested generic or referenced type cannot be resolved.
      */
-    private static <T> void setList(final T instance, final Field field)
-            throws ClassNotFoundException, IllegalAccessException {
-        System.out.println(IS_COLLECTION_LOG);
-        String cName = getGenericClassName(field.getGenericType());
-        Class<?> classObject = Class.forName(cName);
-        List<?> obj = create(classObject, SIZE_LIST);
-        field.set(instance, obj);
+    private static <T> T createRecord(Class<T> clazz)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
+            ClassNotFoundException {
+        final RecordComponent[] recordComponents = clazz.getRecordComponents();
+
+        Class<?>[] parameterTypes = Arrays.stream(recordComponents)
+                .map(RecordComponent::getType)
+                .toArray(Class<?>[]::new);
+
+        Object[] objects = Arrays.stream(recordComponents)
+                .map(recordComponent -> {
+                    try {
+                        return setObjectComponent(recordComponent);
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toArray();
+
+        Constructor<?> constructor = clazz.getDeclaredConstructor(parameterTypes);
+        constructor.setAccessible(true);
+        return (T) constructor.newInstance(objects);
     }
 
     /**
-     * Populates a primitive field with a random value appropriate for its type.
+     * Resolves a record component to a randomly generated value compatible with its declared type.
      *
-     * @param instance The object instance containing the field.
-     * @param field    The field to populate.
-     * @param <T>      The type of the instance.
-     * @throws IllegalAccessException if the field cannot be accessed.
+     * @param recordComponent The component being populated.
+     * @param <T> The inferred type for the generated value.
+     * @return A generated value for the component.
+     * @throws ClassNotFoundException If the component's generic type cannot be loaded.
      */
-    private static <T> void setPrimitive(final T instance, final Field field) throws IllegalAccessException {
-        switch (field.getType().getSimpleName()) {
-            case INT -> field.set(instance, randomNumber(1, 10));
-            case LONG -> field.set(instance, randomNumber(100L, 1000L));
-            case FLOAT -> field.set(instance, randomNumber(10f, 100f));
-            case DOUBLE -> field.set(instance, randomNumber(1.0, 10.0));
-            case BOOLEAN -> field.set(instance, randomBoolean());
-            default -> {
-            }
+    private static <T> T setObjectComponent(RecordComponent recordComponent) throws ClassNotFoundException {
+        if (recordComponent.getType().isEnum()) {
+            return (T) randomEnum(recordComponent.getType());
+        } else if (recordComponent.getType().isPrimitive()) {
+            return generatePrimitive(recordComponent.getType());
+        } else if (Collection.class.isAssignableFrom(recordComponent.getType())) {
+            Type genericType = recordComponent.getGenericType();
+            return generateList(getGenericClassName(genericType));
+        } else {
+            return (T) createObject(recordComponent.getType(), true);
         }
     }
 
     /**
-     * Populates a non-primitive object field with a random value or a nested dummy object.
-     * <p>
-     * Handles specific standard types (String, Numbers, Dates, Boolean) by generating random values.
-     * For unknown types, it recursively creates a new dummy object.
-     * </p>
+     * Instantiates a class and fills its declared fields with generated values.
      *
-     * @param instance The object instance containing the field.
-     * @param field    The field to populate.
-     * @param <T>      The type of the instance.
-     * @throws IllegalAccessException    if the field cannot be accessed.
-     * @throws ClassNotFoundException    if the class of the field type cannot be found.
-     * @throws InvocationTargetException if the constructor throws an exception.
-     * @throws NoSuchMethodException     if a matching constructor is not found.
-     * @throws InstantiationException    if the class cannot be instantiated.
+     * @param clazz The type to create.
+     * @param isRecord Indicates whether the target type is a record and should be created via its constructor.
+     * @param <T> The type of object to instantiate.
+     * @return A populated object instance.
+     * @throws ClassNotFoundException If a nested or collection element type cannot be resolved.
      */
-    private static <T> void setObject(final T instance, final Field field)
-            throws IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException,
-            InstantiationException {
-        field.trySetAccessible();
-        final String typeName = field.getType().getSimpleName().toLowerCase();
+    private static <T> T createObject(final Class<T> clazz, final boolean isRecord) throws ClassNotFoundException {
+        if (isRecord) {
+            return createObject(clazz);
+        } else {
+            try {
+                final T instance = clazz.getDeclaredConstructor().newInstance();
+                final Field[] fields = clazz.getDeclaredFields();
+                for (final Field field : fields) {
+                    field.trySetAccessible();
+                    if (Collection.class.isAssignableFrom(field.getType())) {
+                        field.set(instance, generateList(getGenericClassName(field.getGenericType())));
+                    } else {
+                        field.set(instance, createObject(field.getType()));
+                    }
+                }
+                return instance;
+            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
+                     InstantiationException |
+                     IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    /**
+     * Generates a value for a field or nested type based on its declared Java type.
+     *
+     * @param clazz The type to generate.
+     * @param <T> The generated value type.
+     * @return A value compatible with the supplied class.
+     * @throws ClassNotFoundException If the type requires dynamic loading that fails.
+     */
+    private static <T> T createObject(final Class<?> clazz) throws ClassNotFoundException {
+        if (clazz.isEnum()) {
+            return (T) randomEnum(clazz);
+        } else if (clazz.isPrimitive()) {
+            return generatePrimitive(clazz);
+        } else {
+            return setObject(clazz);
+        }
+    }
+
+    /**
+     * Maps a Java type to a generated default value, including custom handling for supported JDK classes.
+     *
+     * @param clazz The declared type to map.
+     * @param <T> The inferred object type.
+     * @return A generated instance or scalar value matching the class.
+     * @throws ClassNotFoundException If the type is not a supported built-in and cannot be dynamically loaded.
+     */
+    private static <T> T setObject(final Class<?> clazz) throws ClassNotFoundException {
+        final String typeName = clazz.getSimpleName().toLowerCase();
+        T obj = null;
         switch (typeName) {
-            case STRING -> field.set(instance, randomString(10, LETTERS));
-            case INTEGER -> field.set(instance, randomNumber(1, 10));
-            case LONG -> field.set(instance, randomNumber(100L, 1000L));
-            case FLOAT -> field.set(instance, randomNumber(10f, 100f));
-            case DOUBLE -> field.set(instance, randomNumber(1.0, 10.0));
-            case BIG_DECIMAL -> field.set(instance, new BigDecimal(randomNumber(10, 100)));
-            case BOOLEAN -> field.set(instance, randomBoolean());
-            case DATE -> field.set(instance, new Date());
-            case INSTANT -> field.set(instance, new Date().toInstant());
-            case TIMESTAMP -> field.set(instance, new Timestamp(System.currentTimeMillis()));
-            case LOCAL_DATE -> field.set(instance, LocalDate.now());
-            case LOCAL_DATE_TIME -> field.set(instance, LocalDateTime.now());
-            case LOCAL_TIME -> field.set(instance, LocalDateTime.now().toLocalTime());
+            case STRING -> obj = (T) randomString(10, LETTERS);
+            case INTEGER -> obj = (T) randomNumber(1, 10);
+            case LONG -> obj = (T) randomNumber(10L, 100L);
+            case FLOAT -> obj = (T) randomNumber(10f, 100f);
+            case DOUBLE -> obj = (T) randomNumber(10d, 100d);
+            case BIG_DECIMAL -> obj = (T) new BigDecimal(randomNumber(10, 100));
+            case BOOLEAN -> obj = (T) randomBoolean();
+            case DATE -> obj = (T) new Date();
+            case INSTANT -> obj = (T) new Date().toInstant();
+            case TIMESTAMP -> obj = (T) new Timestamp(System.currentTimeMillis());
+            case LOCAL_DATE -> obj = (T) LocalDate.now();
+            case LOCAL_DATE_TIME -> obj = (T) LocalDateTime.now();
+            case LOCAL_TIME -> obj = (T) LocalDateTime.now().toLocalTime();
             default -> {
-                String className = field.getType().getName();
-                Class<?> classObject = Class.forName(className);
-                Object obj = create(classObject);
-                field.set(instance, obj);
+                final String className = clazz.getTypeName();
+                final Class<?> classObject = Class.forName(className);
+                obj = (T) create(classObject);
             }
         }
+        return obj;
+    }
+
+
+    /**
+     * Creates a random primitive value for supported numeric and boolean types.
+     *
+     * @param clazz The primitive type to generate.
+     * @param <T> The primitive wrapper type.
+     * @param <U> The value produced from the primitive generation.
+     * @return A random primitive value or boolean.
+     */
+    private static <T, U> U generatePrimitive(Class<T> clazz) {
+        U object = null;
+        switch (clazz.getTypeName().toLowerCase()) {
+            case INT -> object = (U) randomNumber(1, 100);
+            case LONG -> object = (U) randomNumber(100L, 1000L);
+            case FLOAT -> object = (U) randomNumber(10f, 100f);
+            case DOUBLE -> object = (U) randomNumber(1d, 100d);
+            case BOOLEAN -> object = (U) randomBoolean();
+        }
+        return object;
+    }
+
+    /**
+     * Generates a list of randomly populated elements for the provided generic type.
+     *
+     * @param className The fully qualified or simple type name of the list element.
+     * @param <T> The resulting list type.
+     * @return A list whose elements are generated according to the provided type.
+     * @throws ClassNotFoundException If the element type cannot be resolved.
+     */
+    private static <T> T generateList(final String className) throws ClassNotFoundException {
+        final Class<?> classObject = Class.forName(className);
+        final List<?> obj = create(classObject, SIZE_LIST);
+        return (T) obj;
     }
 
     /**
@@ -167,7 +247,6 @@ public class Factory {
     private static String getGenericClassName(final Type genericType) {
         String className = genericType.getTypeName();
         className = className.substring(className.indexOf(MINUS_THAN) + 1, className.lastIndexOf(MAJOR_THAN));
-        System.out.println(CLASS_NAME_LOG.concat(className));
         return className;
     }
 

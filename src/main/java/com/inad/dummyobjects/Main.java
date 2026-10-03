@@ -1,6 +1,7 @@
 package com.inad.dummyobjects;
 
 import com.inad.dummyobjects.dto.Person;
+import com.inad.dummyobjects.dto.PersonRecord;
 
 import java.util.List;
 
@@ -12,6 +13,10 @@ public class Main {
         for (final Person person : persons) {
             System.out.println(person);
         }
+
+        System.out.println("Generating PersonRecord instance");
+        final PersonRecord personRecord = Factory.create(PersonRecord.class);
+        System.out.println(personRecord);
 
     }
 }

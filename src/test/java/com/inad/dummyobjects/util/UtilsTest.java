@@ -107,23 +107,18 @@ class UtilsTest {
     private String stringField;
 
     @Test
-    @DisplayName("randomEnum returns a valid enum constant from the field type")
-    void randomEnumTest() throws Exception {
-        Field field = this.getClass().getDeclaredField("dummyField");
-
-        // Repeat a few times to ensure we can hit different values potentially
+    @DisplayName("randomEnum(Class) returns a valid enum constant from the enum type")
+    void randomEnumClassTest() {
         for (int i = 0; i < 10; i++) {
-            DummyEnum result = Utils.randomEnum(field);
+            DummyEnum result = Utils.randomEnum(DummyEnum.class);
             assertNotNull(result);
             assertTrue(result == DummyEnum.ONE || result == DummyEnum.TWO || result == DummyEnum.THREE);
         }
     }
 
     @Test
-    @DisplayName("randomEnum throws ClassCastException for non-enum fields")
-    void randomEnumWithNonEnumFieldTest() throws Exception {
-        Field field = this.getClass().getDeclaredField("stringField");
-
-        assertThrows(ClassCastException.class, () -> Utils.randomEnum(field));
+    @DisplayName("randomEnum(Class) throws ClassCastException for non-enum classes")
+    void randomEnumWithNonEnumClassTest() {
+        assertThrows(ClassCastException.class, () -> Utils.randomEnum(String.class));
     }
 }
