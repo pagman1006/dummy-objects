@@ -2,28 +2,29 @@ package com.inad.dummyobjects.util;
 
 import com.inad.dummyobjects.Factory;
 
-import java.lang.reflect.Field;
 import java.util.Random;
 
 /**
- * Utility class providing methods for generating random values.
+ * Provides small random-value helpers used by {@link Factory} to generate realistic dummy data.
  * <p>
- * This class wraps {@link java.util.Random} to provide easy access to random
- * strings, numbers (integers, longs, floats, doubles), booleans, and enum values.
- * It is primarily used by the {@link Factory} to populate dummy objects.
+ * The class centralizes a shared {@link Random} instance and exposes convenience methods for
+ * strings, numeric ranges, booleans, and enum values. It is designed as a lightweight support
+ * utility for unit tests and object-factory scenarios where repeatedly creating synthetic values
+ * is more convenient than hand-writing fixtures.
  * </p>
  */
 public class Utils {
 
     /**
-     * Private constructor to prevent instantiation.
-     */
-    private Utils() {}
-
-    /**
      * The random number generator used for generating random values.
      */
     private static final Random random = new Random();
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Utils() {
+    }
 
     /**
      * Generates a random string of the specified length.
@@ -48,7 +49,7 @@ public class Utils {
      * @param max The maximum value (exclusive).
      * @return A random long between {@code min} and {@code max}.
      */
-    public static long randomNumber(final long min, final long max) {
+    public static Long randomNumber(final long min, final long max) {
         return random.nextLong(min, max);
     }
 
@@ -59,7 +60,7 @@ public class Utils {
      * @param max The maximum value (exclusive).
      * @return A random float between {@code min} and {@code max}.
      */
-    public static float randomNumber(final float min, final float max) {
+    public static Float randomNumber(final float min, final float max) {
         return random.nextFloat(min, max);
     }
 
@@ -70,7 +71,7 @@ public class Utils {
      * @param max The maximum value (exclusive).
      * @return A random double between {@code min} and {@code max}.
      */
-    public static double randomNumber(final double min, final double max) {
+    public static Double randomNumber(final double min, final double max) {
         return random.nextDouble(min, max);
     }
 
@@ -79,26 +80,29 @@ public class Utils {
      *
      * @return {@code true} or {@code false} randomly.
      */
-    public static boolean randomBoolean() {
+    public static Boolean randomBoolean() {
         return random.nextBoolean();
     }
 
+
     /**
-     * Selects a random enum constant for the type of the provided field.
+     * Selects a random constant from the supplied enum type.
      *
-     * @param field The field representing an Enum type.
-     * @param <E>   The Enum type.
-     * @return A random constant from the enum defined by the field's type.
-     * @throws ClassNotFoundException If the class of the field type cannot be located.
-     * @throws ClassCastException     If the field type is not an Enum.
+     * @param clazz The enum class to sample from.
+     * @param <T> The enum type.
+     * @return A randomly selected enum constant, or {@code null} when the enum has no constants.
+     * @throws ClassCastException If the supplied class is not an enum.
      */
-    @SuppressWarnings("unchecked")
-    public static <E extends Enum<E>> E randomEnum(final Field field)
-            throws ClassNotFoundException, ClassCastException {
-        E[] enums = (E[]) Class.forName(field.getType().getName()).getEnumConstants();
-        if (enums == null) {
-            throw new ClassCastException("Field type is not an enum.");
+    public static <T> T randomEnum(final Class<T> clazz) {
+        if (!clazz.isEnum()) {
+            throw new ClassCastException("Class is not an enum.");
         }
+
+        T[] enums = clazz.getEnumConstants();
+        if (enums == null || enums.length == 0) {
+            return null;
+        }
+
         int rand = randomNumber(0, enums.length);
         return enums[rand];
     }
@@ -110,7 +114,7 @@ public class Utils {
      * @param max The maximum value (exclusive).
      * @return A random int between {@code min} and {@code max}.
      */
-    public static int randomNumber(final int min, final int max) {
+    public static Integer randomNumber(final int min, final int max) {
         return random.nextInt(min, max);
     }
 
