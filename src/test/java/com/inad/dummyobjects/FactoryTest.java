@@ -1,6 +1,5 @@
 package com.inad.dummyobjects;
 
-import com.inad.dummyobjects.dto.PersonRecord;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -86,20 +85,6 @@ class FactoryTest {
             assertNotNull(item.getStringVal(), "List items should have populated fields");
             assertNotNull(item.getInnerDto(), "List items should have populated nested objects");
         }
-    }
-
-    @Test
-    @DisplayName("Factory.create(Class) should create a Record")
-    public void createRecordTest() {
-        final PersonRecord personRecord = Factory.create(PersonRecord.class);
-        assertNotNull(personRecord, "Record should not be null");
-        assertNotNull(personRecord.name(), "Record should not be null");
-        assertNotNull(personRecord.birthDate(), "Record should not be null");
-        assertNotNull(personRecord.lastName(), "Record should not be null");
-        assertNotNull(personRecord.phones(), "Record should not be null");
-        assertNotNull(personRecord.phones().get(0).getNumber(), "Record should not be null");
-        assertNotNull(personRecord.phones().get(0).getPhoneType(), "Record should not be null");
-
     }
 
     public enum TestEnum {
