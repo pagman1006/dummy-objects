@@ -1,83 +1,115 @@
-# Dummy Object Factory (Java)
+# Dummy Objects
 
-This library provides a simple way to create instances of Java objects using dummy data through a factory. It’s ideal for unit testing, rapid development, and 
-scenarios where you need a large number of objects with predefined data.
+A lightweight Java library for generating populated dummy objects for tests, prototypes, and mock data scenarios.
 
-## Key Features
+The project uses reflection to inspect Java classes and records, then fills their fields or record components with random values such as strings, numbers, booleans, dates, enums, collections, and nested objects.
 
-*   **Dynamic Object Creation:** Allows you to create objects of any Java class based on its name.
-*   **Customizable Dummy Data:** Defines the dummy data for each class, with the ability to use different data types (String, Integer, Boolean, etc.).
-*   **Simple Configuration:** An easy-to-use interface for defining the properties of each dummy object.
-*   **Flexibility:** Designed to be used with any Java class.
-*   **Facilitates Unit Testing:** Generates objects with predictable data, simplifying the creation of test cases.
+## Features
+
+- Create a populated instance of any class with `Factory.create(Class<T>)`
+- Create a collection of populated instances with `Factory.create(Class<T>, int)`
+- Supports primitive and wrapper types
+- Supports `String`, `Date`, `BigDecimal`, `Instant`, `LocalDate`, `LocalDateTime`, `LocalTime`, and `Timestamp`
+- Supports enums, lists, and nested object graphs
+- Works with Java records as well as regular classes
 
 ## Installation
 
-1.  **Add the Dependency:**
+Add the dependency to your Maven project:
 
-    You can add the library to your Maven project:
-
-    **Maven:**
-
-    ```xml
-    <dependency>
-        <groupId>io.github.pagman1006</groupId>
-        <artifactId>dummy-objects</artifactId>
-        <version>1.0.0</version>
-    </dependency>
-    ```
+```xml
+<dependency>
+    <groupId>io.github.pagman1006</groupId>
+    <artifactId>dummy-objects</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
 
 ## Usage
 
-1.  **Import the Library:** Import the library's package into your class.
-2.  **Create Objects:** Use the `Factory.create(Class<T>)` static method to create an object of the specified class.
-3.  **For Lists:** Use `Factory.create(Class<T>, int)` static method to create a list of object for the specified class.
-
-## Factory Class
-
-This class centralizes object creation.
-
-*   `create(Class<T>)`: Method that creates an instance of the specified class.
-*   `create(Class<T>, int)`: Method that creates a List of instances for the specified class.
-
-## Configuration
-
-The factory not needs information about the classes to be created and the dummy data to be used for each.
-
-## Example Usage
+Import the factory and generate sample objects directly from a class reference:
 
 ```java
 import com.inad.dummyobjects.Factory;
 import com.inad.dummyobjects.dto.Person;
+import com.inad.dummyobjects.dto.PersonRecord;
+
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // 1. Create an object of the Person class
-        Person person = Factory.create(Person.class);
-
-        // 2. Print the object's data
-        System.out.println("Name: " + person.getName());
-        System.out.println("Age: " + person.getAge());
-
-        // 3. Create a List of object for Person class
-        List<Person> persons = Factory.create(Person.class, 3);
-
-        // 4. Print list
-        for (Person p : persons) {
-            System.out.println("Name: " + p.getName());
-            System.out.println("Age: " + p.getAge());
+        final List<Person> persons = Factory.create(Person.class, 3);
+        System.out.println("Instances Created: " + persons.size());
+        for (final Person person : persons) {
+            System.out.println(person);
         }
+
+        System.out.println("Generating PersonRecord instance");
+        final PersonRecord personRecord = Factory.create(PersonRecord.class);
+        System.out.println(personRecord);
     }
 }
 ```
 
-##  License
+Example model:
+
+```java
+public class Person {
+    private String name;
+    private int age;
+    private boolean active;
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+}
+```
+
+Example record:
+
+```java
+public record PersonRecord(String name, int age, boolean active) {
+}
+```
+
+The library populates the fields automatically as long as the class is instantiable and uses supported types.
+
+## Supported Types
+
+The default factory logic handles common Java types, including:
+
+- primitive and boxed numeric types
+- `String`
+- `boolean` / `Boolean`
+- `Date`
+- `BigDecimal`
+- `Instant`
+- `Timestamp`
+- `LocalDate`
+- `LocalDateTime`
+- `LocalTime`
+- enums
+- Java records
+- `List` and other collection interfaces backed by generated elements
+- nested POJOs and records
+
+## Notes
+
+This library is intended for testing and development workflows where you need realistic-looking sample data without writing custom builders or fixture classes.
+
+## License
 
 Apache License Version 2.0, January 2004
 
 ## Contact
 
-[Andrés Gasca]
-
-[andresg1006@gmail.com]
+Andrés Gasca  
+andresg1006@gmail.com
